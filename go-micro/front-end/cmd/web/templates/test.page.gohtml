@@ -12,6 +12,12 @@
                 href="javascript:void(0)"
                 >Connect to broker</a
             >
+            <a
+                id="authBrokerBtn"
+                class="btn btn-outline-secondary"
+                href="javascript:void(0)"
+                >Test Auth</a
+            >
 
             <div
                 id="output"
@@ -46,6 +52,7 @@
 {{define "js"}}
 <script>
     let brokerBtn = document.getElementById("brokerBtn");
+    let authBrokerBtn = document.getElementById("authBrokerBtn");
     let output = document.getElementById("output");
     let sent = document.getElementById("payload");
     let received = document.getElementById("received");
@@ -62,6 +69,40 @@
                 received.innerHTML = JSON.stringify(data, undefined, 4);
                 if (data.error) {
                     console.log(data.error);
+                } else {
+                    output.innerHTML += `<br><strong>Reponse from broker service</strong>: ${data.message}`;
+                }
+            })
+            .catch((error) => {
+                output.innerHTML += `<br><br>Error: "${error}"`;
+            });
+    });
+
+    authBrokerBtn.addEventListener("click", function () {
+        const payload = {
+            action: "auth",
+            auth: {
+                email: "admin@example.com",
+                password: "verysecret",
+            },
+        };
+
+        const headers = new Headers();
+        headers.append("Content-Type", "application/json");
+
+        const body = {
+            method: "POST",
+            headers: headers,
+            body: JSON.stringify(payload),
+        };
+
+        fetch("http:\/\/localhost:8080/handle", body)
+            .then((response) => response.json())
+            .then((data) => {
+                sent.innerHTML = JSON.stringify(payload, undefined, 4);
+                received.innerHTML = JSON.stringify(data, undefined, 4);
+                if (data.error) {
+                    output.innerHTML += `<br><br>Error: "${data.error}"`;
                 } else {
                     output.innerHTML += `<br><strong>Reponse from broker service</strong>: ${data.message}`;
                 }
