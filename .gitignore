@@ -2,3 +2,4 @@
 *.code-workspace
 postgres
 mongo
+rabbitmq

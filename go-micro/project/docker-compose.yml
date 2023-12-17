@@ -37,6 +37,15 @@ services:
       MAIL_PASSWORD: ""
       MAIL_FROM: "no-reply@localhost"
       MAIL_FROM_NAME: "No Reply"
+  
+  listener-service:
+    build:
+      context: ./../listener-service
+      dockerfile: ./../listener-service/listener-service.dockerfile
+    restart: always
+    deploy:
+      mode: replicated
+      replicas: 1
 
   authentication-service:
     build:
@@ -86,3 +95,15 @@ services:
     ports:
       - "1025:1025"
       - "8025:8025"
+
+  rabbitmq:
+    image: 'rabbitmq:3.9.7-management'
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    restart: always
+    deploy:
+      mode: replicated
+      replicas: 1
+    volumes:
+      - ./db-data/rabbitmq/:/var/lib/rabbitmq/
