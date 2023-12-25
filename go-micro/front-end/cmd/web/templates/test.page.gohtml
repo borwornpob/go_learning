@@ -30,6 +30,12 @@
                 href="javascript:void(0)"
                 >Test Mail</a
             >
+            <a
+                id="logGBtn"
+                class="btn btn-outline-secondary"
+                href="javascript:void(0)"
+                >Test gRPC Log</a
+            >
 
             <div
                 id="output"
@@ -66,6 +72,7 @@
     let brokerBtn = document.getElementById("brokerBtn");
     let authBrokerBtn = document.getElementById("authBrokerBtn");
     let logBtn = document.getElementById("logBtn");
+    let logGBtn = document.getElementById("logGBtn");
     let mailBtn = document.getElementById("mailBtn");
     let output = document.getElementById("output");
     let sent = document.getElementById("payload");
@@ -90,6 +97,40 @@
         };
 
         fetch("http:\/\/localhost:8080/handle", body)
+            .then((response) => response.json())
+            .then((data) => {
+                sent.innerHTML = JSON.stringify(payload, undefined, 4);
+                received.innerHTML = JSON.stringify(data, undefined, 4);
+                if (data.error) {
+                    console.log(data.error);
+                } else {
+                    output.innerHTML += `<br><strong>Reponse from broker service</strong>: ${data.message}`;
+                }
+            })
+            .catch((error) => {
+                output.innerHTML += `<br><br>Error: "${error}"`;
+            });
+    });
+
+    logGBtn.addEventListener("click", function () {
+        const payload = {
+            action: "log",
+            log: {
+                name: "event",
+                data: "Some kind of gRPC data",
+            }
+        }
+
+        const headers = new Headers();
+        headers.append("Content-Type", "application/json");
+
+        const body = {
+            method: "POST",
+            headers: headers,
+            body: JSON.stringify(payload),
+        };
+
+        fetch("http:\/\/localhost:8080/log-grpc", body)
             .then((response) => response.json())
             .then((data) => {
                 sent.innerHTML = JSON.stringify(payload, undefined, 4);
